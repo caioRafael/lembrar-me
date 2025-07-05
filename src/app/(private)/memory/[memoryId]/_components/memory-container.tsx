@@ -127,11 +127,13 @@ export function MemoryContainer({ memoryId }: MemoryContainerProps) {
               <CardContent>
                 <div className="space-y-4">
                   <div className="text-center">
-                    <img
+                    {/* <Image
                       src={memory?.files[0]}
+                      
                       alt={'Imagem anexa'}
                       className="max-w-full h-auto rounded-lg border cursor-pointer hover:shadow-lg transition-shadow mx-auto"
-                    />
+                    /> */}
+                    <h1>imagem aqui</h1>
                   </div>
                 </div>
               </CardContent>

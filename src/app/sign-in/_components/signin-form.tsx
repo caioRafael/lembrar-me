@@ -84,7 +84,7 @@ export default function SignInForm() {
           )}
         />
 
-        <Button className="w-full" type="submit">
+        <Button className="w-full bg-blue-500" type="submit">
           Logar
         </Button>
       </form>

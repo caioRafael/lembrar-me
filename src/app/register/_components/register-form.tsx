@@ -109,7 +109,9 @@ export default function RegisterForm() {
           )}
         />
 
-        <Button type="submit">Cadastrar</Button>
+        <Button className="w-full bg-blue-500" type="submit">
+          Cadastrar
+        </Button>
       </form>
     </Form>
   )

@@ -7,6 +7,7 @@ import { useModals } from '../context/modal-context'
 
 export function MemoriesContainer() {
   const { memories } = useModals()
+  if (memories.length === 0) return <EmptyMemoriesContainer />
   return (
     <div className="col-span-full">
       {memories.length > 0 ? (

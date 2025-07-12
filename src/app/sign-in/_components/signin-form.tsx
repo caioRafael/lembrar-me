@@ -17,6 +17,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
 import { useRouter } from 'next/navigation'
+import { signInFunction } from '../actions'
 
 const formSchema = z.object({
   email: z.string(),
@@ -33,9 +34,12 @@ export default function SignInForm() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       console.log(values)
+      await signInFunction(values)
+
+      // console.log('response: ', response)
       route.push('/dashboard')
       toast(
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">

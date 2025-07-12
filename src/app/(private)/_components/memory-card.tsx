@@ -4,20 +4,21 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Memory } from '@/interfaces/memory'
-import { DeleteMemory } from '@/services/memories'
-import { Calendar, Edit, Eye, Trash2 } from 'lucide-react'
+import { Calendar, Edit } from 'lucide-react'
+import { DeleteMemoryDialog } from './delete-memory-dialog'
 import { useModals } from '../context/modal-context'
-import Link from 'next/link'
+import { MemoryModal } from './memory-modal'
 
 interface MemoryCardProps {
   memory: Memory
 }
 
 export function MemoryCard({ memory }: MemoryCardProps) {
-  const { setMemories } = useModals()
-  const handleDeleteMemory = async () => {
-    const memories = await DeleteMemory(memory.id as string)
-    setMemories(memories)
+  const { setCurrentMemory, createMemoryModalRef } = useModals()
+
+  const handleEditModal = () => {
+    setCurrentMemory(memory)
+    createMemoryModalRef.current?.click()
   }
   return (
     <Card className="card-shadow flex-1 hover:card-shadow-hover transition-all duration-200 group">
@@ -36,19 +37,15 @@ export function MemoryCard({ memory }: MemoryCardProps) {
             <Button
               variant="ghost"
               size="sm"
-              //   onClick={() => handleEdit(memory)}
+              onClick={handleEditModal}
               className="h-8 w-8 p-0 hover:bg-blue-500 hover:text-white"
             >
               <Edit className="h-4 w-4" />
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleDeleteMemory}
-              className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <DeleteMemoryDialog
+              title={memory.title}
+              memoryId={memory.id as string}
+            />
           </div>
         </div>
 
@@ -58,7 +55,7 @@ export function MemoryCard({ memory }: MemoryCardProps) {
       </CardHeader>
 
       <CardContent className="pt-0">
-        <p className="text-description mb-4 line-clamp-3 leading-relaxed">
+        <p className="text-description mb-4 line-clamp-2 leading-relaxed">
           {memory.description}
         </p>
 
@@ -95,15 +92,7 @@ export function MemoryCard({ memory }: MemoryCardProps) {
         )}
 
         <div className="flex gap-3">
-          <Button
-            asChild
-            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white border-0 font-semibold"
-          >
-            <Link href={`/memory/${memory.id}`}>
-              <Eye className="w-4 h-4 mr-2" />
-              Ver Detalhes
-            </Link>
-          </Button>
+          <MemoryModal memoryId={memory.id as string} />
         </div>
       </CardContent>
     </Card>

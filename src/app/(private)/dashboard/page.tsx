@@ -2,7 +2,7 @@ import { Input } from '@/components/ui/input'
 import { Search } from 'lucide-react'
 import { MemoriesContainer } from '../_components/memories-container'
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="text-center mb-8">

@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Memory } from '@/interfaces/memory'
-import { GetMemory } from '@/services/memories'
+import { fetchClient } from '@/services/fetch/client'
 import { Calendar, Eye, Tag } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -16,12 +16,8 @@ export function MemoryContainer({ memoryId }: MemoryContainerProps) {
   const [memory, setMemory] = useState<Memory | null>(null)
 
   useEffect(() => {
-    GetMemory(memoryId).then((res) => {
-      setMemory(res)
-      //   if (res) {
-      //   } else {
-      //     // route.push('/dashboard')
-      //   }
+    fetchClient(`/memory/${memoryId}`, { method: 'GET' }).then((res) => {
+      setMemory(res as Memory)
     })
   }, [memoryId])
   return (

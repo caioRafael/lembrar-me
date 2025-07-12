@@ -29,6 +29,7 @@ import { Memory } from '@/interfaces/memory'
 import { CreateMemory } from '@/services/memories'
 import { useRouter } from 'next/navigation'
 import { useModals } from '../context/modal-context'
+import { fetchClient } from '@/services/fetch/client'
 
 interface CreateMemoryFormProps {
   action?: () => void
@@ -38,12 +39,12 @@ const formSchema = z.object({
   title: z.string().min(1).min(3).max(40),
   description: z.string().min(10).max(3000),
   tags: z.array(z.string()).min(1, 'Por favor adicione pelo menos 1 tag'),
-  file: z.string(),
+  file: z.string().optional(),
 })
 
 export default function CreateMemoryForm({ action }: CreateMemoryFormProps) {
   const [files, setFiles] = useState<File[] | null>(null)
-  const { setMemories, memories } = useModals()
+  const { setMemories, memories, setCurrentMemory, currentMemory } = useModals()
   const route = useRouter()
 
   const dropZoneConfig = {
@@ -53,18 +54,31 @@ export default function CreateMemoryForm({ action }: CreateMemoryFormProps) {
   }
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    defaultValues: currentMemory || {
       title: '',
       description: '',
       tags: ['Lembrança'],
-      file: '',
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       console.log({ ...values, files })
       CreateMemory({ ...values, files } as Memory)
+      let response = {}
+
+      if (currentMemory) {
+        response = await fetchClient(`/memory/${currentMemory.id}`, {
+          method: 'put',
+          body: JSON.stringify({ ...values }),
+        })
+      } else {
+        response = await fetchClient('/memory', {
+          method: 'post',
+          body: JSON.stringify({ ...values }),
+        })
+        setMemories([...memories, response as Memory])
+      }
       toast(
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(values, null, 2)}</code>
@@ -74,12 +88,7 @@ export default function CreateMemoryForm({ action }: CreateMemoryFormProps) {
       if (action) {
         action()
       }
-      const date = new Date()
-      date.setHours(0, 0, 0, 0)
-      setMemories([
-        ...memories,
-        { ...values, files, id: Date.now().toString(), date } as Memory,
-      ])
+      setCurrentMemory(null)
       route.refresh()
     } catch (error) {
       console.error('Form submission error', error)

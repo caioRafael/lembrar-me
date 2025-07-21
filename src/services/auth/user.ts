@@ -5,7 +5,7 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider'
 import { ServiceException } from '@aws-sdk/smithy-client'
 
-const REGION = process.env.COGNITO_REGION!
+const REGION = process.env.NEXT_PUBLIC_COGNITO_REGION!
 const ACCESS_TOKEN_KEY = process.env.NEXT_PUBLIC_ACCESS_TOKEN_KEY!
 
 const client = new CognitoIdentityProviderClient({ region: REGION })

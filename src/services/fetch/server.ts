@@ -1,10 +1,8 @@
+import 'server-only'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-export async function fetchServer(
-  input: RequestInfo,
-  init?: RequestInit,
-): Promise<Response> {
+export async function fetchServer(input: RequestInfo, init?: RequestInit) {
   const accessTokenCookieKey = process.env.NEXT_PUBLIC_ACCESS_TOKEN_KEY!
   const cookieStore = await cookies()
 
@@ -49,5 +47,5 @@ export async function fetchServer(
     redirect('/sign-in')
   }
 
-  return response
+  return response.json()
 }

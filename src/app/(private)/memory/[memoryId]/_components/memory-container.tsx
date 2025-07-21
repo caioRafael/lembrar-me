@@ -1,25 +1,16 @@
-'use client'
-
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Memory } from '@/interfaces/memory'
-import { fetchClient } from '@/services/fetch/client'
+import { fetchServer } from '@/services/fetch/server'
 import { Calendar, Eye, Tag } from 'lucide-react'
-import { useEffect, useState } from 'react'
 
 interface MemoryContainerProps {
   memoryId: string
 }
 
-export function MemoryContainer({ memoryId }: MemoryContainerProps) {
-  const [memory, setMemory] = useState<Memory | null>(null)
-
-  useEffect(() => {
-    fetchClient(`/memory/${memoryId}`, { method: 'GET' }).then((res) => {
-      setMemory(res as Memory)
-    })
-  }, [memoryId])
+export async function MemoryContainer({ memoryId }: MemoryContainerProps) {
+  const memory: Memory = await fetchServer(`/memory/${memoryId}`)
   return (
     <div className="mb-6">
       <div className="flex justify-between items-start mb-6">
@@ -122,17 +113,14 @@ export function MemoryContainer({ memoryId }: MemoryContainerProps) {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {memory.files.map((url, index) => {
-                    console.log(url)
-                    return (
-                      <img
-                        key={index}
-                        src={url}
-                        alt={`Imagem ${index + 1}`}
-                        className="w-full h-auto rounded-lg border cursor-pointer hover:shadow-lg transition-shadow"
-                      />
-                    )
-                  })}
+                  {memory.files.map((url, index) => (
+                    <img
+                      key={index}
+                      src={url}
+                      alt={`Imagem ${index + 1}`}
+                      className="w-full h-auto rounded-lg border cursor-pointer hover:shadow-lg transition-shadow"
+                    />
+                  ))}
                 </div>
               </CardContent>
             </Card>

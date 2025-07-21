@@ -6,8 +6,8 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider'
 import { createHmac } from 'crypto'
 
-const REGION = process.env.COGNITO_REGION!
-const CLIENT_ID = process.env.COGNITO_USER_POOL_CLIENT_ID!
+const REGION = process.env.NEXT_PUBLIC_COGNITO_REGION!
+const CLIENT_ID = process.env.NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID!
 
 const client = new CognitoIdentityProviderClient({ region: REGION })
 
@@ -24,7 +24,7 @@ export function generateSecretHash(
 export async function signUp(email: string, password: string, name: string) {
   const secretHash = generateSecretHash(
     email,
-    process.env.COGNITO_USER_POOL_CLIENT_ID!,
+    process.env.NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID!,
     process.env.COGNITO_USER_POOL_CLIENT_SECRET!,
   )
   console.log('entrou')

@@ -12,3 +12,7 @@ export const getClientCookie = (name: string): string | null => {
 
   return null
 }
+
+export function setCookie(name: string, value: string, expires?: number) {
+  document.cookie = `${name}=${value}; expires=${expires}; path=/`
+}

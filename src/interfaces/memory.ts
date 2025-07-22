@@ -5,6 +5,7 @@ export interface Memory {
   description: string
   tags: string[]
   files: File[] | string[] | null
+  images?: string[]
 }
 
 export interface ExtendedFile extends File {

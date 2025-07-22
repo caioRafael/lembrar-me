@@ -1,10 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { fetchClient } from '@/services/fetch/client'
 import { Trash2 } from 'lucide-react'
-import { useModals } from '../context/modal-context'
-import { Memory } from '@/interfaces/memory'
 import {
   AlertDialog,
   AlertDialogContent,
@@ -16,6 +13,9 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from '@/components/ui/alert-dialog'
+import { deleteMemory } from '../actions/delete-memory'
+import { useRouter } from 'next/navigation'
+import { useTransition } from 'react'
 
 interface DeleteMemoryAlertDialogProps {
   title: string
@@ -26,17 +26,17 @@ export function DeleteMemoryDialog({
   title,
   memoryId,
 }: DeleteMemoryAlertDialogProps) {
-  const { memories, setMemories } = useModals()
+  const router = useRouter()
+  const [isPending, startTransiction] = useTransition()
   const handleDeleteMemory = async () => {
-    try {
-      const filteredMemory = memories.filter((memory) => memory.id !== memoryId)
-      setMemories(filteredMemory as Memory[])
-      await fetchClient(`/memory/${memoryId}`, {
-        method: 'DELETE',
-      })
-    } catch (error) {
-      console.log('erro: ', error)
-    }
+    startTransiction(async () => {
+      try {
+        await deleteMemory(memoryId)
+        router.refresh()
+      } catch (error) {
+        console.log('erro: ', error)
+      }
+    })
   }
 
   return (
@@ -61,7 +61,7 @@ export function DeleteMemoryDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDeleteMemory}>
+          <AlertDialogAction onClick={handleDeleteMemory} disabled={isPending}>
             Deletar
           </AlertDialogAction>
         </AlertDialogFooter>

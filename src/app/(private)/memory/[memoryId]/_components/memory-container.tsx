@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Memory } from '@/interfaces/memory'
 import { fetchServer } from '@/services/fetch/server'
 import { Calendar, Eye, Tag } from 'lucide-react'
+import Image from 'next/image'
 
 interface MemoryContainerProps {
   memoryId: string
@@ -112,13 +113,15 @@ export async function MemoryContainer({ memoryId }: MemoryContainerProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="flex flex-col gap-3">
                   {memory.files.map((url, index) => (
-                    <img
+                    <Image
                       key={index}
-                      src={url}
+                      src={url as string}
                       alt={`Imagem ${index + 1}`}
-                      className="w-full h-auto rounded-lg border cursor-pointer hover:shadow-lg transition-shadow"
+                      height={800}
+                      width={1100}
+                      className="w-full h-full rounded-lg border cursor-pointer hover:shadow-lg transition-shadow"
                     />
                   ))}
                 </div>

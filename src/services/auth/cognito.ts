@@ -9,7 +9,7 @@ import { createHmac } from 'crypto'
 const REGION = process.env.NEXT_PUBLIC_COGNITO_REGION!
 const CLIENT_ID = process.env.NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID!
 
-const client = new CognitoIdentityProviderClient({ region: REGION })
+export const client = new CognitoIdentityProviderClient({ region: REGION })
 
 export function generateSecretHash(
   username: string,

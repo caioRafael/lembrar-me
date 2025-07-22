@@ -1,17 +1,25 @@
+'use client'
+
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Memory } from '@/interfaces/memory'
-import { fetchServer } from '@/services/fetch/server'
+import { fetchClient } from '@/services/fetch/client'
 import { Calendar, Eye, Tag } from 'lucide-react'
-import Image from 'next/image'
+import { useEffect, useState } from 'react'
 
 interface MemoryContainerProps {
   memoryId: string
 }
 
-export async function MemoryContainer({ memoryId }: MemoryContainerProps) {
-  const memory: Memory = await fetchServer(`/memory/${memoryId}`)
+export function MemoryContainer({ memoryId }: MemoryContainerProps) {
+  const [memory, setMemory] = useState<Memory | null>(null)
+
+  useEffect(() => {
+    fetchClient(`/memory/${memoryId}`, { method: 'GET' }).then((res) => {
+      setMemory(res as Memory)
+    })
+  }, [memoryId])
   return (
     <div className="mb-6">
       <div className="flex justify-between items-start mb-6">
@@ -113,17 +121,18 @@ export async function MemoryContainer({ memoryId }: MemoryContainerProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-col gap-3">
-                  {memory.files.map((url, index) => (
-                    <Image
-                      key={index}
-                      src={url as string}
-                      alt={`Imagem ${index + 1}`}
-                      height={800}
-                      width={1100}
-                      className="w-full h-full rounded-lg border cursor-pointer hover:shadow-lg transition-shadow"
-                    />
-                  ))}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {memory.files.map((url, index) => {
+                    console.log(url)
+                    return (
+                      <img
+                        key={index}
+                        src={url}
+                        alt={`Imagem ${index + 1}`}
+                        className="w-full h-auto rounded-lg border cursor-pointer hover:shadow-lg transition-shadow"
+                      />
+                    )
+                  })}
                 </div>
               </CardContent>
             </Card>

@@ -16,6 +16,8 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
+import { registerUser } from '../actions'
+import { useRouter } from 'next/navigation'
 
 const formSchema = z.object({
   name: z.string().min(1).min(4),
@@ -25,18 +27,27 @@ const formSchema = z.object({
 })
 
 export default function RegisterForm() {
+  const route = useRouter()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      confirmPassword: '',
+      email: '',
+      name: '',
+      password: '',
+    },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      console.log(values)
+      await registerUser(values)
       toast(
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(values, null, 2)}</code>
         </pre>,
       )
+      localStorage.setItem('user-email', values.email)
+      route.push('/register/confirmation')
     } catch (error) {
       console.error('Form submission error', error)
       toast.error('Failed to submit the form. Please try again.')

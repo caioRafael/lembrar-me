@@ -1,12 +1,11 @@
-'use client'
-
 import { EmptyMemoriesContainer } from './empty-memories-container'
 import { Card, CardContent } from '@/components/ui/card'
 import { MemoryCard } from './memory-card'
-import { useModals } from '../context/modal-context'
+import { fetchServer } from '@/services/fetch/server'
+import { Memory } from '@/interfaces/memory'
 
-export function MemoriesContainer() {
-  const { memories } = useModals()
+export async function MemoriesContainer() {
+  const memories: Memory[] = await fetchServer('/memory')
   return (
     <div className="col-span-full">
       {memories.length > 0 ? (

@@ -1,14 +1,17 @@
-import { Button } from '@/components/ui/button'
 import { BookOpen } from 'lucide-react'
 import { ReactNode } from 'react'
 import { ModalProvider } from './context/modal-context'
 import { NewMemoryFunction } from './_components/new-memory-modal'
+import { getCurrentUser } from '@/services/auth/user'
+import { SignOutButton } from './_components/sign-out-button'
 
 interface PrivateLayoutProps {
   children: ReactNode
 }
 
-export default function PrivateLayout({ children }: PrivateLayoutProps) {
+export default async function PrivateLayout({ children }: PrivateLayoutProps) {
+  const { user } = await getCurrentUser()
+  console.log(user)
   return (
     <ModalProvider>
       <div className="min-h-screen bg-main-background">
@@ -34,20 +37,13 @@ export default function PrivateLayout({ children }: PrivateLayoutProps) {
                 <div className="flex items-center gap-4">
                   <div className="text-right">
                     <p className="text-sm font-semibold text-dark-title">
-                      Caio Rafael
+                      {user?.UserAttributes.name}
                     </p>
                     <p className="text-xs text-description">
-                      caiorafaelrg@gmail.com
+                      {user?.UserAttributes.email}
                     </p>
                   </div>
-                  <Button
-                    variant="outline"
-                    // onClick={logout}
-                    size="sm"
-                    className="border-soft-blue text-description hover:bg-primary-blue hover:text-white hover:border-primary-blue bg-transparent"
-                  >
-                    Sair
-                  </Button>
+                  <SignOutButton />
                 </div>
               </div>
             </div>

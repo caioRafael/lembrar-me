@@ -9,7 +9,7 @@ interface MemoryPageProps {
 export default async function MemoryPage({ params }: MemoryPageProps) {
   const { memoryId } = await params
   return (
-    <div className="w-full max-w-[1000px] mx-auto mt-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <MemoryContainer memoryId={memoryId} />
     </div>
   )

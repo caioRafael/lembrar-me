@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -26,9 +26,11 @@ import {
 import { TagsInput } from '@/components/ui/extension/tags-input'
 import Image from 'next/image'
 import { Memory } from '@/interfaces/memory'
-import { CreateMemory } from '@/services/memories'
 import { useRouter } from 'next/navigation'
 import { useModals } from '../context/modal-context'
+import { createMemory } from '../actions/create-memory'
+import { updateMemory } from '../actions/update-memory'
+import { filesToBase64 } from '@/lib/convertToBase64'
 
 interface CreateMemoryFormProps {
   action?: () => void
@@ -38,12 +40,13 @@ const formSchema = z.object({
   title: z.string().min(1).min(3).max(40),
   description: z.string().min(10).max(3000),
   tags: z.array(z.string()).min(1, 'Por favor adicione pelo menos 1 tag'),
-  file: z.string(),
+  file: z.string().optional(),
 })
 
 export default function CreateMemoryForm({ action }: CreateMemoryFormProps) {
+  const [isPending, startTransiction] = useTransition()
   const [files, setFiles] = useState<File[] | null>(null)
-  const { setMemories, memories } = useModals()
+  const { setCurrentMemory, currentMemory } = useModals()
   const route = useRouter()
 
   const dropZoneConfig = {
@@ -53,38 +56,42 @@ export default function CreateMemoryForm({ action }: CreateMemoryFormProps) {
   }
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    defaultValues: currentMemory || {
       title: '',
       description: '',
       tags: ['Lembrança'],
-      file: '',
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      console.log({ ...values, files })
-      CreateMemory({ ...values, files } as Memory)
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>,
-      )
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    startTransiction(async () => {
+      try {
+        const images = await filesToBase64(files as File[])
+        console.log({ ...values, images })
 
-      if (action) {
-        action()
+        if (currentMemory) {
+          await updateMemory(currentMemory.id as string, values as Memory)
+        } else {
+          await createMemory({ ...values, images } as Memory)
+        }
+        toast(
+          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+            <code className="text-white">
+              {JSON.stringify(values, null, 2)}
+            </code>
+          </pre>,
+        )
+
+        if (action) {
+          action()
+        }
+        setCurrentMemory(null)
+        route.refresh()
+      } catch (error) {
+        console.error('Form submission error', error)
+        toast.error('Failed to submit the form. Please try again.')
       }
-      const date = new Date()
-      date.setHours(0, 0, 0, 0)
-      setMemories([
-        ...memories,
-        { ...values, files, id: Date.now().toString(), date } as Memory,
-      ])
-      route.refresh()
-    } catch (error) {
-      console.error('Form submission error', error)
-      toast.error('Failed to submit the form. Please try again.')
-    }
+    })
   }
 
   return (
@@ -205,7 +212,9 @@ export default function CreateMemoryForm({ action }: CreateMemoryFormProps) {
             </FormItem>
           )}
         />
-        <Button type="submit">Salvar</Button>
+        <Button type="submit" disabled={isPending}>
+          Salvar
+        </Button>
       </form>
     </Form>
   )
